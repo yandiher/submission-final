@@ -434,29 +434,14 @@ numerik = np.array([
 # BACK
 
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
-# from sklearn.model_selection import train_test_split
-# from sklearn.metrics import accuracy_score, classification_report, ConfusionMatrixDisplay
 from sklearn.ensemble import RandomForestClassifier
+import xgboost as xgb
 
-dataset = pd.read_csv('dataset_clean.csv')
-dataset.drop([dataset.keys()[0]], axis=1, inplace=True)
+onehot = joblib.load('onehot.joblib')
+scaler = joblib.load('scaler.joblib')
 
-x = dataset.iloc[:,:-1]
-y = dataset.iloc[:,-1]
-
-onehot = OneHotEncoder(sparse_output=False)
-onehot.fit(x[x.select_dtypes(include=['object']).columns.tolist()])
-
-x_onehot = onehot.transform(x[x.select_dtypes(include=['object']).columns.tolist()].values,)
-x_number = x[x.select_dtypes(include=['number']).columns.tolist()].values
-x_merge = np.concatenate((x_onehot, x_number), axis=1)
-
-scaler = MinMaxScaler()
-scaler.fit(x_merge)
-x_scaler = scaler.transform(x_merge)
-
-clf = RandomForestClassifier()
-clf.fit(x_scaler, y)
+clf = xgb.XGBClassifier()
+clf.load_model('xgb_model.json')
 
 himpunan_kategorikal = onehot.transform([kategorikal])
 himpunan = np.concatenate((himpunan_kategorikal, [numerik]), axis=1)
